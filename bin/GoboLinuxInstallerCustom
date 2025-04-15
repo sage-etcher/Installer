@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+from cwizard import AbsCursesWizard as Wizard
+from cwizard import AbsCursesScreen as Screen
+
+# globals
+
+class our_app:
+	def __init__(self, wizard_name = 'OurAppWizard'):
+		self.app = Wizard(wizard_name)
+
+		# the landing screen dynamically creates a page index, but it requires
+		# that the screens already be created. Additionally we want the 
+		# Landing to be the first screen user see
+	
+		# Define Landing shortcuts, starting at index 1
+		self.app.currentScreen = 1
+		self.app.addScreen(self.__gen_disk_setup(), -1)
+		self.app.addScreen(self.__gen_set_selection(), -1)
+		self.app.addScreen(self.__gen_set_selection(), -1)
+		self.app.addScreen(self.__gen_set_selection(), -1)
+		
+		# Define the Landing at index 0
+		self.app.currentScreen = -1 
+		self.app.addScreen(self.__gen_landing(), -1)
+
+		return
+
+
+	def start(self):
+		return self.app.start()
+
+
+	def __show_screen(self, screen_index):
+		self.app.currentScreen = screen_index
+		self.app.screens[screen_index].setFocus(0)
+
+	
+	def __show_screen_cb(self, screen_index):
+		return lambda : self.__show_screen(screen_index)
+
+
+	# screens
+	def __gen_landing(self):
+		s = Screen('Landing')
+
+		s.addLabel('', 'LLorem Ipsum Lorem Ipsum Lorem Ipsum Lorem.')
+
+		# dynamically create an index of pages as goto buttons, skip the first
+		# page as it is undefined at this point, reserved for the landing.
+		for i, screen in enumerate(self.app.screens[0:]):
+			s.addButton('', screen.title, 
+					tooltip  = f'goto the {screen.title} page',
+					callBack = self.__show_screen_cb(i))
+
+		return s
+
+
+	def __gen_disk_setup(self):
+		s = Screen('Disk Setup')
+		s.addButton('', 'Im a Button')
+		return s
+
+
+	def __gen_set_selection(self):
+		s = Screen('Set Selection')
+		s.addButton('', 'Im a Button')
+		return s
+
+
+def start_gui():
+	app = our_app()
+	rc = app.start()
+	return rc
+
+	
+def main():
+	rc = start_gui()
+	return rc;
+
+
+if __name__ == "__main__":
+	exit(main())
+
+# end of file
